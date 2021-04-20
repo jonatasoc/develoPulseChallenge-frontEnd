@@ -1,4 +1,6 @@
 import React, { useCallback, useState } from 'react';
+import { useHistory } from 'react-router';
+
 import {
   Button,
   FormControl,
@@ -10,8 +12,10 @@ import {
 } from '@material-ui/core';
 import * as Yup from 'yup';
 import { MdSend } from 'react-icons/md';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
-import { Container, Form, Title } from './ContactUsForm.styles';
+import { Form } from './ContactUsForm.styles';
+import api from '../../services/api';
 
 interface UserInfo {
   firstName: string;
@@ -40,20 +44,40 @@ const states = [
   'SK',
   'QC',
   'YT',
+  'YTddddddddddd',
 ];
 
 const ContactUsForm: React.FC = () => {
   const [userInfo, setUserInfo] = useState({} as UserInfo);
+  const [cities, setCities] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [validationErros, setValidationErros] = useState(
     {} as ValidationErrors,
   );
+
+  const history = useHistory();
+
+  const loadCities = useCallback((province: string) => {
+    try {
+      api.get(`/Cities?province=${province}`).then(response => {
+        setCities(response.data.Items);
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   const handleSelectChange = useCallback(e => {
     setUserInfo(prevState => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
+
+    if (e.target.name === 'province') {
+      const provinceName = e.target.value;
+
+      loadCities(provinceName);
+    }
 
     setValidationErros(prevState => ({
       ...prevState,
@@ -92,9 +116,34 @@ const ContactUsForm: React.FC = () => {
       });
 
       try {
+        setIsLoading(true);
+
         await schema.validate(userInfo, {
           abortEarly: false,
         });
+
+        const {
+          firstName,
+          lastName,
+          street,
+          unit,
+          province,
+          city,
+          email,
+        } = userInfo;
+
+        const data = {
+          name: `${firstName} ${lastName}`,
+          address: street,
+          address2: unit,
+          province,
+          city,
+          email,
+        };
+
+        const response = await api.post('/Save', data);
+
+        history.push('/success');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const erros: ValidationErrors = {};
@@ -105,156 +154,156 @@ const ContactUsForm: React.FC = () => {
             }
           });
 
-          console.log(erros);
-
           setValidationErros(erros);
+        } else {
+          console.log(err);
         }
+      } finally {
+        setIsLoading(false);
       }
     },
     [userInfo],
   );
 
-  console.log(userInfo);
-
   return (
-    <Container>
-      <Title>Contact US</Title>
-      <Form onSubmit={handleSubmit}>
-        <TextField
-          label="First Name"
-          variant="outlined"
-          required
-          value={userInfo.firstName}
-          onChange={e => {
-            setUserInfo({
-              ...userInfo,
-              firstName: e.target.value,
-            });
+    <Form onSubmit={handleSubmit}>
+      <TextField
+        label="First Name"
+        variant="outlined"
+        required
+        value={userInfo.firstName}
+        onChange={e => {
+          setUserInfo({
+            ...userInfo,
+            firstName: e.target.value,
+          });
 
-            setValidationErros({
-              ...validationErros,
-              firstName: '',
-            });
-          }}
-          error={!!validationErros.firstName}
-          helperText={validationErros.firstName}
-        />
-        <TextField
-          label="Last Name"
-          variant="outlined"
-          required
-          value={userInfo.lastName}
-          onChange={e => {
-            setUserInfo({
-              ...userInfo,
-              lastName: e.target.value,
-            });
+          setValidationErros({
+            ...validationErros,
+            firstName: '',
+          });
+        }}
+        error={!!validationErros.firstName}
+        helperText={validationErros.firstName}
+      />
+      <TextField
+        label="Last Name"
+        variant="outlined"
+        required
+        value={userInfo.lastName}
+        onChange={e => {
+          setUserInfo({
+            ...userInfo,
+            lastName: e.target.value,
+          });
 
-            setValidationErros({
-              ...validationErros,
-              lastName: '',
-            });
-          }}
-          error={!!validationErros.lastName}
-          helperText={validationErros.lastName}
-        />
-        <TextField
-          label="Street Address"
-          variant="outlined"
-          required
-          value={userInfo.street}
-          onChange={e => {
-            setUserInfo({
-              ...userInfo,
-              street: e.target.value,
-            });
+          setValidationErros({
+            ...validationErros,
+            lastName: '',
+          });
+        }}
+        error={!!validationErros.lastName}
+        helperText={validationErros.lastName}
+      />
+      <TextField
+        label="Street Address"
+        variant="outlined"
+        required
+        value={userInfo.street}
+        onChange={e => {
+          setUserInfo({
+            ...userInfo,
+            street: e.target.value,
+          });
 
-            setValidationErros({
-              ...validationErros,
-              street: '',
-            });
-          }}
-          error={!!validationErros.street}
-          helperText={validationErros.street}
-        />
-        <TextField
-          label="Unit/Apt"
-          variant="outlined"
-          value={userInfo.unit}
-          onChange={e => {
-            setUserInfo({
-              ...userInfo,
-              unit: e.target.value,
-            });
+          setValidationErros({
+            ...validationErros,
+            street: '',
+          });
+        }}
+        error={!!validationErros.street}
+        helperText={validationErros.street}
+      />
+      <TextField
+        label="Unit/Apt"
+        variant="outlined"
+        value={userInfo.unit}
+        onChange={e => {
+          setUserInfo({
+            ...userInfo,
+            unit: e.target.value,
+          });
 
-            setValidationErros({
-              ...validationErros,
-              unit: '',
-            });
-          }}
-          error={!!validationErros.unit}
-          helperText={validationErros.unit}
-        />
-        <FormControl variant="outlined" error={!!validationErros.province}>
-          <InputLabel id="province-label">
-            Province/Territory/province
-          </InputLabel>
-          <Select
-            labelId="province-label"
-            value={userInfo.province}
-            onChange={handleSelectChange}
-            label="province"
-            name="province"
-            required
-            error={!!validationErros.state}
-          >
-            {states.map(state => (
-              <MenuItem value={state}>{state}</MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{validationErros.state}</FormHelperText>
-        </FormControl>
-        <FormControl variant="outlined" error={!!validationErros.city}>
-          <InputLabel id="city-label">City</InputLabel>
-          <Select
-            labelId="city-label"
-            value={userInfo.city}
-            onChange={handleSelectChange}
-            label="city"
-            name="city"
-            required
-          >
-            <MenuItem value="Ten">Ten</MenuItem>
-            <MenuItem value="Twenty">Twenty</MenuItem>
-            <MenuItem value="Thirty">Thirty</MenuItem>
-          </Select>
-          <FormHelperText>{validationErros.city}</FormHelperText>
-        </FormControl>
-        <TextField
-          label="Email"
-          variant="outlined"
+          setValidationErros({
+            ...validationErros,
+            unit: '',
+          });
+        }}
+        error={!!validationErros.unit}
+        helperText={validationErros.unit}
+      />
+      <FormControl variant="outlined" error={!!validationErros.province}>
+        <InputLabel id="province-label">Province/Territory/province</InputLabel>
+        <Select
+          labelId="province-label"
+          value={userInfo.province}
+          onChange={handleSelectChange}
+          label="province"
+          name="province"
           required
-          type="email"
-          value={userInfo.email}
-          onChange={e =>
-            setUserInfo({
-              ...userInfo,
-              email: e.target.value,
-            })
-          }
-          error={!!validationErros.email}
-          helperText={validationErros.email}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          endIcon={<MdSend />}
-          type="submit"
+          error={!!validationErros.state}
         >
-          Send
-        </Button>
-      </Form>
-    </Container>
+          {states.map(state => (
+            <MenuItem value={state}>{state}</MenuItem>
+          ))}
+        </Select>
+        <FormHelperText>{validationErros.state}</FormHelperText>
+      </FormControl>
+      <FormControl variant="outlined" error={!!validationErros.city}>
+        <InputLabel id="city-label">City</InputLabel>
+        <Select
+          labelId="city-label"
+          value={userInfo.city}
+          onChange={handleSelectChange}
+          label="city"
+          name="city"
+          required
+        >
+          {cities &&
+            cities.map(city => <MenuItem value={city}>{city}</MenuItem>)}
+        </Select>
+        <FormHelperText>{validationErros.city}</FormHelperText>
+      </FormControl>
+      <TextField
+        label="Email"
+        variant="outlined"
+        required
+        type="email"
+        value={userInfo.email}
+        onChange={e =>
+          setUserInfo({
+            ...userInfo,
+            email: e.target.value,
+          })
+        }
+        error={!!validationErros.email}
+        helperText={validationErros.email}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        endIcon={
+          isLoading ? (
+            <AiOutlineLoading3Quarters className="lds-dual-ring" size={20} />
+          ) : (
+            <MdSend />
+          )
+        }
+        type="submit"
+      >
+        Send
+      </Button>
+    </Form>
   );
 };
 

@@ -1,27 +1,7 @@
 import styled from 'styled-components';
 
-export const Container = styled.main`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-
-  height: 100vh;
-  width: 450px;
-  margin: 0 auto;
-`;
-
-export const Title = styled.p`
-  color: var(--blue);
-
-  font-size: 30px;
-  letter-spacing: 1px;
-
-  margin-bottom: 40px;
-`;
-
 export const Form = styled.form`
-  width: 100%;
+  width: 80%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -30,5 +10,22 @@ export const Form = styled.form`
   .MuiFormControl-root {
     width: 100%;
     margin-bottom: 15px;
+  }
+
+  .MuiButton-root {
+    margin-top: 25px;
+  }
+
+  .lds-dual-ring {
+    animation: lds-dual-ring 1.2s linear infinite;
+  }
+
+  @keyframes lds-dual-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;

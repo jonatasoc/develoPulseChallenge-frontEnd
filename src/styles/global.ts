@@ -20,6 +20,7 @@ const GlobalStyle = createGlobalStyle`
     --blue: #5965e0;
     --blue-dark: #4953b8;
     --blue-twitter: #2aa9e0;
+    --white: #fff;
   }
 
   ::-webkit-scrollbar {
