@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3333',
+  baseURL: 'https://imc-hiring-test.azurewebsites.net/Contact',
   timeout: 8000,
 });
 
