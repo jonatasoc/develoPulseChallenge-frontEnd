@@ -44,7 +44,6 @@ const states = [
   'SK',
   'QC',
   'YT',
-  'YTddddddddddd',
 ];
 
 const ContactUsForm: React.FC = () => {
