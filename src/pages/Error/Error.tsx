@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router';
 
 import { Button } from '@material-ui/core';
-import { MdAddAlert, MdArrowBack } from 'react-icons/md';
+import { MdArrowBack } from 'react-icons/md';
 import { GoAlert } from 'react-icons/go';
 
 import { Container, Card, Title } from './Error.styles';
