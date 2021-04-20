@@ -2,7 +2,6 @@ import React from 'react';
 import { useHistory } from 'react-router';
 
 import { Button } from '@material-ui/core';
-import * as Yup from 'yup';
 import { MdCheckCircle, MdArrowBack } from 'react-icons/md';
 
 import { Container, Card, Title } from './Success.styles';

@@ -63,27 +63,31 @@ const ContactUsForm: React.FC = () => {
         setCities(response.data.Items);
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   }, []);
 
-  const handleSelectChange = useCallback(e => {
-    setUserInfo(prevState => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
+  const handleSelectChange = useCallback(
+    e => {
+      setUserInfo(prevState => ({
+        ...prevState,
+        [e.target.name]: e.target.value,
+      }));
 
-    if (e.target.name === 'province') {
-      const provinceName = e.target.value;
+      if (e.target.name === 'province') {
+        const provinceName = e.target.value;
 
-      loadCities(provinceName);
-    }
+        loadCities(provinceName);
+      }
 
-    setValidationErros(prevState => ({
-      ...prevState,
-      [e.target.name]: '',
-    }));
-  }, []);
+      setValidationErros(prevState => ({
+        ...prevState,
+        [e.target.name]: '',
+      }));
+    },
+    [loadCities],
+  );
 
   const handleSubmit = useCallback(
     async e => {
@@ -141,7 +145,7 @@ const ContactUsForm: React.FC = () => {
           email,
         };
 
-        const response = await api.post('/Save', data);
+        await api.post('/Save', data);
 
         history.push('/success');
       } catch (err) {
@@ -156,13 +160,13 @@ const ContactUsForm: React.FC = () => {
 
           setValidationErros(erros);
         } else {
-          console.log(err);
+          history.push('/error');
         }
       } finally {
         setIsLoading(false);
       }
     },
-    [userInfo],
+    [userInfo, history],
   );
 
   return (
