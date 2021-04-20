@@ -1,13 +1,15 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+
 import GlobalStyle from './styles/global';
-import ContactUsForm from './components/ContactUsForm';
+import Routes from './routes';
 
 const App: React.FC = () => {
   return (
-    <>
+    <Router>
       <GlobalStyle />
-      <ContactUsForm />
-    </>
+      <Routes />
+    </Router>
   );
 };
 
